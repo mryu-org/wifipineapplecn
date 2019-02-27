@@ -1,0 +1,12 @@
+{
+    "author": "Hak5",
+    "description": "Paint a picture of the WiFi landscape.",
+    "devices": [
+        "nano",
+        "tetra"
+    ],
+    "system": true,
+    "title": "侦察",
+    "version": "1.2",
+    "index": 2
+}

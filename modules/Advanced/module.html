@@ -1,0 +1,185 @@
+<div class="row">
+    <div class="col-md-6" ng-controller="AdvancedResourcesController">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    资源
+                    <span class="dropdown">
+                        <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="resourcesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="generalDropdown">
+                            <li ng-click="dropCaches()"><a>删除页面缓存</a></li>
+                        </ul>
+                    </span>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="alert well-sm alert-success ng-hide" ng-show="droppedCaches">成功删除了缓存.</div>
+                <pre class="scrollable-pre">{{ freeDisk }}</pre>
+                <br/>
+                <pre class="scrollable-pre">{{ freeMem }}</pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" ng-controller="AdvancedUSBController">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    USB
+                    <span class="dropdown" ng-if="device == 'nano'">
+                        <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="usbDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="generalDropdown">
+                            <li ng-click="formatSDCard()"><a>格式化SD卡</a></li>
+                        </ul>
+                    </span>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="center-block" ng-hide="lsusb">
+                    <img class="center-block" src="img/throbber.gif">
+                    <br/>
+                </div>
+                <div class="alert well-sm alert-info ng-hide" ng-show="formattingSDCard">格式化SD卡，请稍候. <img src="img/throbber.gif"></div>
+                <div class="alert well-sm alert-success ng-hide" ng-show="formatSuccess">成功格式化SD卡</div>
+                <pre class="scrollable-pre" ng-show="lsusb">{{ lsusb }}</pre>
+                <p>
+                    <textarea class="form-control" rows="8" ng-model="fstab"></textarea>
+                </p>
+                <p class="alert well-sm alert-success" ng-show="fstabSaved">Fstab成功保存</p>
+                <button type="submit" class="btn btn-default" ng-click="saveFstab()">保存Fstab</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default" ng-controller="AdvancedUpgradeController">
+            <div class="panel-heading">
+                <h3 class="panel-title">固件升级 (当前版本: {{ firmwareVersion }})</h3>
+            </div>
+            <div class="panel-body">
+                <div ng-hide="upgradeFound">
+                    <p class="text-center text-danger" ng-show="error">{{ error }}</p>
+                    <button class="btn btn-default center-block" ng-click="checkForUpgrade()" ng-hide="loading">检查升级</button>
+                    <img class="center-block" src="img/throbber.gif" ng-show="loading">
+                    <p>
+                        <hr>
+                    </p>
+                    <p ng-if="device == 'tetra'">
+                        警告：固件升级将替换设备上的所有数据，请确保已将任何重要的非系统数据备份到外部存储。
+                    </p>
+                    <p ng-if="device == 'nano'">
+                        警告：固件升级将替换未存储在SD卡上的所有数据， 请确保已将任何重要的非系统数据备份到外部存储。
+                    </p>
+                    <p>
+                        请在升级前停止任何不必要的服务和模块，建议在不启动其他服务和模块的情况下重新启动WiFi Pineapple，以确保正确停止额外的进程。
+                    </p>
+                    <p>
+                        只能在使用稳定电源的情况下升级固件，建议在此过程中使用WiFiPineapple的以太网连接。
+                    </p>
+                    <p>
+                        固件升级完成后，WiFi Pineapple将重新启动进入初始设置状态，此过程将需要几分钟，请勿通过拔掉电源或关闭Web界面来中断升级过程，因为这可能会导致软砖状态。
+                    </p>
+                    <p>
+                        有关恢复或手动升级说明和帮助，请访问<a href="https://www.wifipineapple.com/?flashing">https://www.wifipineapple.com/?flashing</a>.
+                    </p>
+                </div>
+                <div ng-show="upgradeFound && !downloading && !downloaded">
+                    <p>
+                        一个新的固件 (version {{upgradeData['version']}}) 可用.
+                    </p>
+                    <h4>更新日志:</h4>
+                    <p ng-bind-html="upgradeData['changelog'] | rawHTML">
+                        更新日志:
+                    </p>
+                    <p>
+                        <button class="btn btn-default center-block" ng-click="downloadUpgrade()">执行升级</button>
+                    </p>
+                </div>
+                <div class="text-center" ng-show="downloading">
+                    正在下载固件，请稍候.
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="downloadPercentage" aria-valuemin="0" aria-valuemax="100" style="width: {{ downloadPercentage }}%">
+                            <span class="sr-only">{{downloadPercentage}}% 完成</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" ng-show="downloaded">
+                    <p>下载完成，请等待固件升级.</p>
+                    <p>
+                        <img src="img/throbber.gif">
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" ng-controller="AdvancedCSSController">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">CSS</h3>
+            </div>
+            <div class="panel-body">
+                <p>
+                    <textarea class="form-control" rows="13" ng-model="css"></textarea>
+                </p>
+                <p class="alert well-sm alert-success" ng-show="cssSaved">CSS保存成功</p>
+                <button type="submit" class="btn btn-default" ng-click="saveCSS()">保存CSS</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div ng-controller="APITokenController">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        管理API令牌
+                        <span class="pull-right"><button class="btn btn-default btn-xs btn-fixed-length" ng-click="getApiTokens();">刷新</button></span>
+                    </h3>
+                </div>
+                <table class="table table-hover table-responsive table-condensed table-layout-fixed" ng-show="apiTokens.length">
+                    <thead>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Token</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="apiToken in apiTokens">
+                            <td class="col-md-1">{{ apiToken.rowid }}</td>
+                            <td class="col-md-3">{{ apiToken.name }}</td>
+                            <td class="col-md-5 truncated" ng-click="selectOnClick($event);">{{ apiToken.token }}</td>
+                            <td class="col-md-3"><span class="pull-right"><button tokenid="{{ apiToken.rowid }}" class="btn btn-danger btn-sm" ng-click="revokeApiToken($event);">撤消</button></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="panel-body text-center" ng-hide="apiTokens.length">
+                    <span class="text-info">没有API Tokens</span>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        生成新Token
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" role="form" ng-submit="genApiToken()" novalidate>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Token名称</span>
+                                <input name="tokenName" type="text" class="form-control" id="tokenName" ng-model="newToken.name">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-default">生成</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
