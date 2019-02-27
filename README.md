@@ -20,4 +20,4 @@ scp -r root@wifipineapple IP:/pineapple/ /Users/xxxxx/Desktop/wifipineapple汉�
 至此刷新WEB页面即可看到简体汉字页面。
 
 ## 后续计划
-* 逐个汉化模块
+* 模块逐个汉化模块
